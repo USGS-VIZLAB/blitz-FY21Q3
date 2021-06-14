@@ -1,6 +1,6 @@
-# The low down on flow down low Visualization
+# gauging gages
 
-All charts, data, and diagrams are free and open to the public. 
+This is an experimental repo designed to put streamflow data into context using the SensorThings API. All charts, data, and diagrams are free and open to the public. 
 
 ## The Code
 The project is Open Source and uses the Vue JavaScript framework in conjunction with animated Scalable Vector Graphics (SVG) and raster graphics. The build process uses the Jenkins task runner and Docker containerisation.

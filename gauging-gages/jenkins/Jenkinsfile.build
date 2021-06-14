@@ -28,7 +28,7 @@ pipeline {
                           extensions: [],
                           gitTool: 'Default',
                           submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/usgs-vizlab/snow-to-flow.git']]
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-vizlab/blitz-FY21Q3/gauging-gages.git']]
                         ])
                 }
         }
@@ -37,9 +37,9 @@ pipeline {
             steps {
 
                 sh """
-                    docker build . --tag="snow-to-flow-docker" --build-arg BUILDTARGET=${params.BUILD_DEST} --build-arg VUE_BUILD_MODE=${params.VUE_BUILD_MODE}
-                    docker run snow-to-flow-docker
-                    pathtemplate=":tmp/snow-to-flow/dist"
+                    docker build . --tag="gauging-gages-docker" --build-arg BUILDTARGET=${params.BUILD_DEST} --build-arg VUE_BUILD_MODE=${params.VUE_BUILD_MODE}
+                    docker run gauging-gages-docker
+                    pathtemplate=":tmp/gauging-gages/dist"
                     dockerinstanceid=\$( docker ps -l -q )
                     docker cp  "\${dockerinstanceid}\${pathtemplate}" "$WORKSPACE"
                     docker rm "\${dockerinstanceid}"
@@ -52,13 +52,13 @@ pipeline {
             steps {
                 script {
                     if ("${params.BUILD_DEST}" == "prod") {
-                        targetDomain = "s3://water-visualizations-prod-website/visualizations/snow-to-flow"
+                        targetDomain = "s3://water-visualizations-prod-website/visualizations/gauging-gages"
                     }
                     else if ("${params.BUILD_DEST}" == "beta") {
-                        targetDomain = "s3://water-visualizations-beta-website/visualizations/snow-to-flow"
+                        targetDomain = "s3://water-visualizations-beta-website/visualizations/gauging-gages"
                     }
                     else {
-                        targetDomain = "s3://water-visualizations-test-website/visualizations/snow-to-flow"
+                        targetDomain = "s3://water-visualizations-test-website/visualizations/gauging-gages"
                     }
                 }
                 sh """

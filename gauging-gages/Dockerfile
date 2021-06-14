@@ -1,6 +1,6 @@
 FROM artifactory.wma.chs.usgs.gov/docker-official-mirror/debian:stretch
 
-LABEL maintainer="makerspace-team@usgs.gov"
+LABEL maintainer="cnell@usgs.gov"
 
 # Run updates and install curl
 RUN apt-get update && \

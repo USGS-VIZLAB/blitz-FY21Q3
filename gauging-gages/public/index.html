@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-63TYRT5PQD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'G-63TYRT5PQD');
+    </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <%= process.env.VUE_APP_TIER !== '' ? '<meta name="robots" content="noindex,nofollow">' : '' %><!-- an empty string in this case means the 'prod' version of the application   -->
+      <!-- Primary Meta Tags -->
+      <title>
+        <%= VUE_APP_TIER %>
+          <%= VUE_APP_TITLE %>
+      </title>
+      <meta name="title" content="gauging gages">
+      <meta name="description" content="">
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="https://labs.waterdata.usgs.gov/visualizations/gauging-gages/index.html#/">
+      <meta property="og:title" content="The low down on flow down low">
+      <meta property="og:description" content="">
+      <meta property="og:image" content="https://labs-beta.waterdata.usgs.gov/visualizations/gauging-gages/SnowToFlowMetacard.jpg">
+      <!-- Twitter -->
+      <meta property="twitter:card" content="summary_large_image">
+      <meta property="twitter:url" content="https://labs.waterdata.usgs.gov/visualizations/gauging-gages/index.html#/">
+      <meta property="twitter:title" content="The low down on flow down low">
+      <meta property="twitter:description" content="">
+      <meta property="twitter:image" content="https://labs-beta.waterdata.usgs.gov/visualizations/gauging-gages/social-tag-cards-1-1.jpg">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <script type='application/ld+json'>
+      { "@context": "http://www.schema.org",
+        "@type": "WebSite", "name": "From Snow to Flow",
+        "url": "https://labs.waterdata.usgs.gov/visualizations/gauging-gages/index.html#/",
+        "about": "what's the water like?",
+        "datePublished": "FILL THIS OUT",
+        "contributor": [
+          { "@type": "Person",
+            "name": "Colleen Nell",
+            "email": "cnell@usgs.gov",
+            "affiliation": { "@type": "Organization", "legalName": "U.S. Geological Survey" }
+          }
+         ]
+      },
+      "audience": { "@context": "http://schema.org", "@type": "Audience", "audienceType": "General public"},
+      "publisher": { "@context": "http://schema.org", "@type": "Organization", "legalName": "U.S. Geological Survey" },
+      "keywords": "water, discharge, cfs, real-time data delivery, data viz, data visualization, SensorThings, water data" }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but this application doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <!--the next line is the required USGS Google Analytics Script -->
+    <script async src="https://www2.usgs.gov/scripts/analytics/usgs-analytics.js" type="application/javascript"></script>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PB7NXPG" height="0" width="0"
+        style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  </body>
+</html>

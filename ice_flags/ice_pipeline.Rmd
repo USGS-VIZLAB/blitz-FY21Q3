@@ -1,0 +1,119 @@
+---
+title: "USGS Gage Ice Condition Popsicles"
+author: "Lindsay R.C. Platt"
+output: html_document
+---
+
+# The pipeline
+
+This R Markdown file is using a `targets` pipeline to get the data and create the viz. All of the code chunks in this section called `The pipeline` would go in a `_targets.R` file. Then, you would use the commands under the `Build the pipeline` section to run it.
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message=FALSE, tar_interactive = FALSE)
+library(targets)
+```
+
+```{targets example-globals, tar_globals = TRUE}
+# Prep targets pipeline stuff
+options(tidyverse.quiet = TRUE)
+tar_option_set(packages = c("dataRetrieval", "tidyverse", "ggplot2", "sf", "geofacet"))
+```
+
+## Get the data
+
+There is lotsa data and it does take a few hours to download. If you want to speed things up, subset `state.abb` below by changing to a vector of the state abbreviations you are interested in, e.g. `c("WI", "VA", "OH")`.
+
+```{targets fetch-data}
+start_date <- as.Date("2020-09-01")
+end_date <- as.Date("2021-05-31")
+
+list(
+  tar_target(states, state.abb),
+  tar_target(winter_flow_data, {
+    message("Pulling data for ", states)
+    readNWISdata(
+      stateCd = states, service = "dv", parameterCd = "00060", 
+      startDate = start_date, endDate = end_date) %>% 
+      renameNWISColumns() %>% 
+      mutate(Date = as.Date(dateTime)) %>% 
+      select(site_no, Date, Flow, Flow_cd) %>% 
+      mutate(state_abb = states)
+  }, pattern = map(states)),
+  tar_target(winter_flow_sites, unique(winter_flow_data$site_no)),
+  tar_target(winter_flow_site_info, readNWISsite(winter_flow_sites))
+)
+```
+
+## Process the data
+
+Remove any values that are missing flow but aren't ice. Add a column that categorizes the remaining values as "flow" or "ice".
+
+```{targets process-data}
+list(
+  tar_target(winter_data, 
+             winter_flow_data %>% 
+               mutate(is_ice = Flow_cd == "P Ice") %>% 
+               mutate(is_na_no_ice = !is_ice & is.na(Flow)) %>% 
+               # Remove missing values when they aren't missing due to ice
+               filter(!is_na_no_ice) %>% 
+               # Add column with category for ice or flow
+               mutate(condition = ifelse(is_ice, "ice", "flow"))),
+  tar_target(winter_flow_site_loc, select(winter_flow_site_info, site_no, station_nm, dec_lat_va, dec_long_va))
+)
+```
+
+## Visualize the data
+
+Plot the data using the percent of values that are not ice per day as the bar height. This prevents weird jaggedness from gages that are missing for other reasons and more clearly shows where ice are causing issues vs not.
+
+```{targets popsicle_bite_viz}
+list(
+  
+  # Prep data for plotting by calculating the percent values ice vs not ice per day
+  #   this makes the tops all flat unless there were ice values bc otherwise the total
+  #   number of values could change per day.
+  tar_target(xmid, mean(c(start_date, end_date))),
+  tar_target(winter_data_ready, 
+             winter_data %>% 
+               group_by(state_abb, Date) %>% 
+               summarize(ntotal = n(), nflow = sum(!is_ice), .groups = "keep") %>% 
+               mutate(perc_not_ice = round(nflow/ntotal*100,2))),
+  
+  tar_target(popsicle_viz, 
+             ggplot(winter_data_ready, aes(x=Date, y=perc_not_ice)) +
+               geom_bar(stat = 'identity', position="dodge", color = "#FFB48A", fill = "#FFB48A") +
+               # Add the popsicle stem (use ggchicklet::geom_chicklet?)
+               geom_rect(xmin = xmid-20, xmax = xmid+20, ymin = -25, ymax=0, fill = "#D2B48C") +
+               # Add State labels inside the popsicles
+               geom_text(x = xmid, y = 10, aes(label = state_abb), hjust=0.5, vjust=0, 
+                         color = "white", size = 6) +
+               # Attempt to make bars tall looking (more like a popsicle) by adding 
+               # equally-sized, empty space on either side of winter.
+               expand_limits(x=c(start_date-90, end_date+90), y=c(-25,100)) +
+               theme_minimal() +
+               theme(axis.text.y = element_blank(), axis.text.x = element_blank(), axis.title = element_blank(),
+                     panel.grid = element_blank(), panel.spacing = unit(0, "lines"), 
+                     legend.position = "none", strip.text = element_blank()) +
+               facet_geo(~state_abb, grid = "us_state_grid1")),
+  
+  tar_target(gage_ice_popsicles_png, 
+             {
+               plotfn <- "gage_ice_popsicles.png"
+               ggsave(plotfn, popsicle_viz, width = 10, height = 10)
+               return(plotfn)
+             },
+             format = "file")
+)
+
+```
+
+# Build the pipeline and then look at the results
+
+```{r build_pipeline}
+targets::tar_make()
+```
+
+```{r show_viz, fig.height=10, fig.width=10, echo=FALSE}
+tar_load(popsicle_viz)
+print(popsicle_viz)
+```

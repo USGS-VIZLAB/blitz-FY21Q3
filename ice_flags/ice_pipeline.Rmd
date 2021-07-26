@@ -6,7 +6,7 @@ output: html_document
 
 # The pipeline
 
-This R Markdown file is using a `targets` pipeline to get the data and create the viz. All of the code chunks in this section called `The pipeline` would go in a `_targets.R` file. Then, you would use the commands under the `Build the pipeline` section to run it.
+This R Markdown file uses a `targets` pipeline to get the data and create the viz. You can build this just as you would any R Markdown document - click Knit at the top. If you wanted to run each step of the pipeline, you can change `tar_interactve` to `TRUE` in the code chunk below. Learn more about using `targets` pipelines inside R Markdown documents in the User Manual [here](https://books.ropensci.org/targets/markdown.html#pipeline).
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message=FALSE, tar_interactive = FALSE)
